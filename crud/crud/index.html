@@ -1,0 +1,81 @@
+<html>
+
+<head>
+    <link rel="stylesheet" type="text/css" href="css/ionic.css">
+    <script type="text/javascript" src="js/jquery.js"></script>
+    <script type="text/javascript">
+    $(document).ready(function() {
+        $("#insert").click(function() {
+            var phone = $("#phone").val();
+            var email = $("#email").val();
+            var destination = $("#destination").val();
+            var  start = $("#start").val();
+            var  end = $("#end").val();
+            var  price= $("#price").val();
+            var dataString = "phone=" + phone + "&email=" + email + "&destination=" + destination + "&start=" + start + "&end="+end+"&price="+price+"&insert=";
+            if ($.trim(phone).length > 0 & $.trim(email).length > 0 & $.trim(destination).length > 0 & $.trim(start).length > 0 & $.trim(end).length > 0 & $.trim(price).length > 0) {
+                $.ajax({
+                    type: "POST",
+                    url: "http://tesseris.esy.es/Dev/crudserver/insert.php",
+                    data: dataString,
+                    crossDomain: true,
+                    cache: false,
+                    beforeSend: function() {
+                        $("#insert").val('Connecting...');
+                    },
+                    success: function(data) {
+                        if (data == "success") {
+                            alert("inserted");
+                            $("#insert").val('submit');
+                        } else if (data == "error") {
+                            alert("error");
+                        }
+                    }
+                });
+            }
+            return false;
+        });
+    });
+    </script>
+</head>
+
+<body>
+    <div class="bar bar-header bar-positive" style="margin-bottom:80px;">
+        <h1 class="title">Insert Database</h1>
+        <a class="button button-clear" href="readjson.html">Read JSON</a>
+    </div>
+    <br/>
+    <br/>
+    <div class="list">
+        <input type="hidden" id="id" value="" />
+        <div class="item">
+            <label>phone</label>
+            <input type="text" id="phone" value="" />
+        </div>
+        <div class="item">
+            <label>desstination</label>
+            <input type="text" id="destination" value="" />
+        </div>
+        <div class="item">
+            <label>email</label>
+            <input type="text" id="email" value="" />
+        </div>
+        <div class="item">
+            <label>start</label>
+            <input type="text" id="start" value="" />
+        </div>
+        <div class="item">
+            <label>end</label>
+            <input type="text" id="end" value="" />
+        </div>
+        <div class="item">
+            <label>price</label>
+            <input type="text" id="price" value="" />
+        </div>
+        <div class="item">
+            <input type="button" id="insert" class="button button-block" value="Insert" />
+        </div>
+    </div>
+</body>
+
+</html>

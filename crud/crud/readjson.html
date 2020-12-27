@@ -1,0 +1,170 @@
+<!doctype html>
+<html>
+<meta name="viewport" content="width=device-width, initial-scale=3.0">
+<head>
+   
+    <script type="text/javascript" src="js/jquery.js"></script>
+    <script type="text/javascript" src="js/geturi.js"></script>
+    <script type="text/javascript">
+    var stockData = [];
+	var stockData1 = new Array(stockData) ;
+	//var stockData = "["+stockData1+"]";
+	$(document).ready(function() {
+        var csv = decodeURI(getUrlVars()["cluster"]);
+        var url = "../crudserver/getcsv.php?csv="+csv+"";
+        var json = $.getJSON(url, function(result) {
+            console.log(result);
+            $.each(result, function(i, field) {
+                var msid = field.MSISDN;
+                var clustr = field.CLUSTER;
+                //var contentid = field.content_id;
+                //var rev = field.rev;
+                //var aktifpaket = field.aktif_paket;
+               // $("#listview").append("<li>Cluster:"+cluster+"|msidn:"+msidn+"|content:"+contentid+"|rev:"+rev+"|aktif:"+aktifpaket+"|</li>");
+			//console.log(msid);
+	   var url1 = "../crudserver/ssearch.php?msidn="+msid+"&clustr="+clustr+"";
+       
+		$.getJSON(url1, function(result) {
+            console.log(result);
+			
+            $.each(result, function(i, field) {
+                var msidn = field.msidn;
+                var cluster = field.cluster;
+                var contentid = field.content_id;
+                var rev = field.rev;
+                var paket = field.paket;
+				
+				stockData.push('{"msidn":"'+msidn+'","cluster":"'+cluster+'","content id":"'+contentid+'","rev":"'+rev+'","paket":"'+paket+'"}');				
+				$("#contenttable").append("<tr><td>"+msidn+"</td><td>"+cluster+"</td><td>"+contentid+"</td><td>"+rev+"</td><td>"+paket+"</td></tr>")
+				//$("#csv").append('{msisdn :"'+msidn+'"},');
+				
+				//var contentid = field.content_id;
+                //var rev = field.rev;
+                //var aktifpaket = field.aktif_paket;
+               // $("#listview").append("<li>Cluster:"+cluster+"|msidn:"+msidn+"|content:"+contentid+"|rev:"+rev+"|aktif:"+aktifpaket+"|</li>");
+            });
+        });
+            });
+        });
+		
+		
+    });
+	
+	//var stockData = document.getElementById("csvdata");
+	
+	var	es = $("#csv").html();
+	//var	stockData = [""+es+""];
+	
+	function ee(){
+			$("#csv").append("["+stockData+"]");
+			//stockData = new Array(stockData);
+			jsonarray = JSON.parse(JSON.stringify(stockData));
+			stockData = jsonarray;
+			console.log(es);
+			ee1();
+			$("#downloadcsv").click();
+			
+	}
+	function ee1(){
+	var	es = $("#csv").html();
+	stockData = es;
+			//$("#csv").append("["+stockData+"]");
+			//stockData = new Array(stockData);
+			jsonarray = JSON.parse(stockData);
+			stockData=jsonarray;
+			//stockData = jsonarray;
+			console.log(jsonarray);
+	}
+	
+    function convertArrayOfObjectsToCSV(args) {
+        var result, ctr, keys, columnDelimiter, lineDelimiter, data;
+
+        data = args.data || null;
+        if (data == null || !data.length) {
+            return null;
+        }
+
+        columnDelimiter = args.columnDelimiter || ',';
+        lineDelimiter = args.lineDelimiter || '\n';
+
+        keys = Object.keys(data[0]);
+
+        result = '';
+        result += keys.join(columnDelimiter);
+        result += lineDelimiter;
+
+        data.forEach(function(item) {
+            ctr = 0;
+            keys.forEach(function(key) {
+                if (ctr > 0) result += columnDelimiter;
+
+                result += item[key];
+                ctr++;
+            });
+            result += lineDelimiter;
+        });
+
+        return result;
+    }
+
+    function downloadCSV() {
+        var data, filename, link;
+        var args = decodeURI(getUrlVars()["cluster"]);
+        var csv = convertArrayOfObjectsToCSV({
+            data: stockData
+        });
+        if (csv == null) return;
+
+        filename = args || 'export.csv';
+
+        if (!csv.match(/^data:text\/csv/i)) {
+            csv = 'data:text/csv;charset=utf-8,' + csv;
+        }
+        data = encodeURI(csv);
+
+        link = document.createElement('a');
+        link.setAttribute('href', data);
+        link.setAttribute('download', filename);
+        link.click();
+    }
+
+    </script>
+</head>
+
+<body>
+
+        <h1 class="title" style="text-align:center;">Search Result</h1>
+		
+		<a href="" style="display:none;" id="downloadcsv"  onclick='downloadCSV({ filename: "" });'>Download CSV</a>
+		<a href="" onclick='ee();'><h5 style="width:100%;text-align:center;">Unduh CSV</a>
+		<a href="" style="display:none;" onclick='ee1();'>ee1</a>
+		
+		<a href="../../WEB/index.php"  ><h5 style="width:100%;text-align:center;">home<h5></a>
+    <table class="list" id="contenttable" style="width:100%;">
+    <tr><th>msidn</th><th>cluster</th><th>contentid</th><th>rev</th><th>paket</th></tr>
+	
+	</table>
+	<div id="csv" style="display:none;"></div>
+</body>
+<style>
+body{
+
+}
+td{
+text-align:center;
+}
+table#contenttable tr:nth-child(even){
+background:#eee;
+}
+
+table#contenttable tr:nth-child(odd){
+background:#fff;
+}
+
+table, th, td{
+border:1px solid black;
+
+border-collapse:collapse;
+}
+</style>
+</html>
